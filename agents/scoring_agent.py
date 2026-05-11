@@ -8,6 +8,7 @@ WEIGHTS = {
     "communication_quality": 0.10
 }
 
+
 def calculate_dimension_score(value):
 
     if value >= 85:
@@ -19,57 +20,104 @@ def calculate_dimension_score(value):
     return 2
 
 
+def convert_to_text(value):
+
+    if isinstance(value, list):
+        return " ".join([str(v) for v in value])
+
+    elif isinstance(value, str):
+        return value
+
+    return ""
+
+
 def score_candidate(jd, candidate):
 
-    jd_skills = jd.get("skills", [])
-    candidate_skills = candidate.get("skills", [])
+    jd_skills = convert_to_text(
+        jd.get("skills", [])
+    )
 
-    jd_projects = jd.get("projects", [])
-    candidate_projects = candidate.get("projects", [])
+    candidate_skills = convert_to_text(
+        candidate.get("skills", [])
+    )
 
-    if not isinstance(jd_skills, list):
-        jd_skills = []
+    jd_projects = convert_to_text(
+        jd.get("projects", [])
+    )
 
-    if not isinstance(candidate_skills, list):
-        candidate_skills = []
+    candidate_projects = convert_to_text(
+        candidate.get("projects", [])
+    )
 
-    if not isinstance(jd_projects, list):
-        jd_projects = []
+    jd_experience = str(
+        jd.get("experience", "")
+    )
 
-    if not isinstance(candidate_projects, list):
-        candidate_projects = []
+    candidate_experience = str(
+        candidate.get("experience", "")
+    )
+
+    jd_education = str(
+        jd.get("education", "")
+    )
+
+    candidate_education = str(
+        candidate.get("education", "")
+    )
+
+    jd_communication = str(
+        jd.get("communication_requirements", "")
+    )
+
+    candidate_communication = str(
+        candidate.get("communication_quality", "")
+    )
 
     skill_similarity = semantic_similarity(
-        " ".join(jd_skills),
-        " ".join(candidate_skills)
+        jd_skills,
+        candidate_skills
     )
 
     project_similarity = semantic_similarity(
-        " ".join(jd_projects),
-        " ".join(candidate_projects)
+        jd_projects,
+        candidate_projects
     )
 
     experience_similarity = semantic_similarity(
-        str(jd.get("experience", "")),
-        str(candidate.get("experience", ""))
+        jd_experience,
+        candidate_experience
     )
 
     education_similarity = semantic_similarity(
-        str(jd.get("education", "")),
-        str(candidate.get("education", ""))
+        jd_education,
+        candidate_education
     )
 
     communication_similarity = semantic_similarity(
-        str(jd.get("communication_requirements", "")),
-        str(candidate.get("communication_quality", ""))
+        jd_communication,
+        candidate_communication
     )
 
     scores = {
-        "skills_match": calculate_dimension_score(skill_similarity),
-        "experience_relevance": calculate_dimension_score(experience_similarity),
-        "education_certs": calculate_dimension_score(education_similarity),
-        "projects_portfolio": calculate_dimension_score(project_similarity),
-        "communication_quality": calculate_dimension_score(communication_similarity)
+        "skills_match": calculate_dimension_score(
+            skill_similarity
+        ),
+
+        "experience_relevance": calculate_dimension_score(
+            experience_similarity
+        ),
+
+        "education_certs": calculate_dimension_score(
+            education_similarity
+        ),
+
+        "projects_portfolio": calculate_dimension_score(
+            project_similarity
+        ),
+
+        "communication_quality": calculate_dimension_score(
+            communication_similarity
+        )
     }
 
     total = (
